@@ -73,7 +73,8 @@ class TruckOrder extends CommonObject
 		'weight' => array('type'=>'double','sqlfield'=>'p.weight', 'label'=>'Weight', 'enabled'=>'1', 'position'=>1, 'table'=>'product as p', 'visible'=>1,'fetch'=>1),
 		'palette' => array('type'=>'integer', 'label'=>'TOPalette', 'enabled'=>'1', 'position'=>1, 'table'=>'product as p', 'visible'=>1,'fetch'=>0),
 		'price' => array('type'=>'price','sqlfield'=>'pcp.price', 'label'=>'PriceUHT', 'enabled'=>'1', 'position'=>1, 'table'=>'product_customer_price as pcp', 'visible'=>1,'fetch'=>1,'jointype'=>'INNER JOIN', 'joinkey'=>'p.rowid=pcp.fk_product'),
-		'fk_soc' => array('type'=>'interger','sqlfield'=>'pcp.fk_soc', 'label'=>'customer', 'enabled'=>'1', 'position'=>1, 'table'=>'product_customer_price as pcp', 'visible'=>0,'fetch'=>1,'jointype'=>'INNER JOIN', 'joinkey'=>'p.rowid=pcp.fk_product'),
+		//'fk_soc' => array('type'=>'interger','sqlfield'=>'pcp.fk_soc', 'label'=>'customer', 'enabled'=>'1', 'position'=>1, 'table'=>'product_customer_price as pcp', 'visible'=>0,'fetch'=>1,'jointype'=>'INNER JOIN', 'joinkey'=>'p.rowid=pcp.fk_product'),
+		'pcpid' => array('type'=>'interger','sqlfield'=>'pcp.rowid', 'label'=>'customer', 'enabled'=>'1', 'position'=>1, 'table'=>'product_customer_price as pcp', 'visible'=>0,'fetch'=>1,'jointype'=>'INNER JOIN', 'joinkey'=>'p.rowid=pcp.fk_product'),
 	);
 
 	/**

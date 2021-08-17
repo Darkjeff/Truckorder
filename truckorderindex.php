@@ -40,6 +40,9 @@ if (!$res && file_exists("../../../main.inc.php")) $res = @include "../../../mai
 if (!$res) die("Include of main fails");
 
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
+require_once DOL_DOCUMENT_ROOT.'/commande/class/commande.class.php';
+require_once DOL_DOCUMENT_ROOT.'/product/class/productcustomerprice.class.php';
+require_once DOL_DOCUMENT_ROOT.'/product/class/product.class.php';
 dol_include_once('/truckorder/class/truckorder.class.php');
 
 // Security check
@@ -56,6 +59,7 @@ $langs->loadLangs(array("truckorder@truckorder",'orders'));
 
 $action = GETPOST('action', 'aZ09');
 $cmd_dt = dol_mktime(0, 0, 0, GETPOST('cmd_dtmonth', 'int'), GETPOST('cmd_dtday', 'int'), GETPOST('cmd_dtyear', 'int'));
+$cmd_dt_c = GETPOST('cmd_dt_c', 'int');
 $ref_client = GETPOST('ref_client', 'alpha');
 $socid = GETPOST('socid', 'int');
 
@@ -131,7 +135,7 @@ if (empty($reshook)) {
 	}
 
 	if ($action == 'list' && !empty($socid)) {
-		if (empty($conf->global->MAIN_DISABLE_FULL_SCANLIST)) {
+		/*if (empty($conf->global->MAIN_DISABLE_FULL_SCANLIST)) {
 			$dataProduct = $object->fetchAllProductPrice('', '', 0, 0, array('pcp.fk_soc' => $socid));
 		}
 		if (!is_array($dataProduct) && $dataProduct < 0) {
@@ -139,12 +143,56 @@ if (empty($reshook)) {
 			$dataProduct = null;
 		} elseif(count($dataProduct)>0) {
 			$nbtotalofrecords = count($dataProduct);
-			$dataProduct = $object->fetchAllProductPrice('', '', $limit, $offset, array('pcp.fk_soc' => $socid));
-			if (!is_array($dataProduct) && $dataProduct < 0) {
-				setEventMessages($object->error, $object->errors, 'errors');
-				$dataProduct = null;
+		*/
+		$dataProduct = $object->fetchAllProductPrice('', '', $limit, $offset, array('pcp.fk_soc' => $socid));
+		if (!is_array($dataProduct) && $dataProduct < 0) {
+			setEventMessages($object->error, $object->errors, 'errors');
+			$dataProduct = null;
+		} else {
+			$num = count($dataProduct);
+			$nbtotalofrecords = $num;
+		}
+	}
+	if ($action == 'createorder' && !empty($socid)) {
+		$order = new Commande($db);
+		$order->socid=$socid;
+		$order->date=$cmd_dt_c;
+		$order->ref_client=$ref_client;
+		$order->modelpdf=$conf->global->COMMANDE_ADDON_PDF;
+		foreach($_POST as $key=>$val) {
+			if (strpos($key, 'qty_') !== false && !empty(GETPOST($key))) {
+				$pcp = new Productcustomerprice($db);
+				$prod = new Product($db);
+				$prd_id=str_replace('qty_', '', $key);
+				$resultpcp = $pcp->fetch(GETPOST('pcpid_'.$prd_id, 'int'));
+				if ($resultpcp<0) {
+					setEventMessage($pcp->error, 'errors');
+				} else {
+					$resultProd = $prod->fetch($prd_id);
+					if ($resultProd<0) {
+						setEventMessage($prod->error, 'errors');
+					} else {
+						$line = new OrderLine($db);
+						$line->tva_tx=$pcp->tva_tx;
+						$line->vat_src_code=$pcp->default_vat_code;
+						$line->desc=$prod->description;
+						$line->subprice=$pcp->price;
+						$line->qty=GETPOST($key, 'int');
+						$line->fk_product=$prod->id;
+						$line->product_type=$prod->type;
+						$line->label=$prod->label;
+						$order->lines[]=$line;
+					}
+				}
+			}
+		}
+		if (!empty($order->lines)) {
+			$resultOrder=$order->create($user);
+			if ($resultOrder<0) {
+				setEventMessage($order->error, 'errors');
 			} else {
-				$num = count($dataProduct);
+				header("Location: ".dol_buildpath('/commande/card.php', 2)."?id=".$order->id);
+				exit;
 			}
 		}
 	}
@@ -245,19 +293,25 @@ if (!empty($dataProduct)) {
 
 	print '<input type="hidden" name="token" value="'.newToken().'">';
 	print '<input type="hidden" name="formfilteraction" id="formfilteraction" value="list">';
-	print '<input type="hidden" name="action" value="list">';
+	print '<input type="hidden" name="action" value="createorder">';
+	print '<input type="hidden" name="socid" value="'.$socid.'">';
+	print '<input type="hidden" name="cmd_dt_c" value="'.$cmd_dt.'">';
+	print '<input type="hidden" name="ref_client" value="'.$ref_client.'">';
 
 
 	//$newcardbutton = dolGetButtonTitle($langs->trans('New'), '', 'fa fa-plus-circle', dol_buildpath('/bibliotheque/livre_card.php', 1).'?action=create&backtopage='.urlencode($_SERVER['PHP_SELF']), '', $permissiontoadd);
 	$newcardbutton='';
 
-	print_barre_liste($title, $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, 'object_'.$object->picto, 0, $newcardbutton, '', $limit, 0, 0, 1);
+	print_barre_liste($title, $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, 'object_'.$object->picto, 0, $newcardbutton, '', $limit, 1, 0, 1);
 	print '<div class="div-table-responsive">'; // You can use div-table-responsive-no-min if you dont need reserved height for your table
 	print '<table class="tagtable nobottomiftotal liste'.($moreforfilter ? " listwithfilterbefore" : "").'">'."\n";
 	print '<tr class="liste_titre">';
 	foreach ($object->fieldsProduct as $key => $val) {
 		if (array_key_exists('visible', $val) && $val['visible']>0) {
 			$cssforfield='center';
+			if (in_array($val['type'], array('double(24,8)', 'double(6,3)', 'integer', 'real', 'price')) && !in_array($key, array('rowid', 'status')) && empty($val['arrayofkeyval'])) {
+				$cssforfield .= ($cssforfield ? ' ' : '').'right';
+			}
 			print getTitleFieldOfList($val['label'], 0, $_SERVER['PHP_SELF'], $key, '', $param, 'class="'.$cssforfield.'"', $sortfield, $sortorder, $cssforfield.' ')."\n";
 		}
 	}
@@ -284,14 +338,22 @@ if (!empty($dataProduct)) {
 
 			if (array_key_exists('visible', $val) && $val['visible']>0) {
 				print '<td'.($cssforfield ? ' class="'.$cssforfield.'"' : '').'>';
-
-				print $object->showOutputField($val, $key, $data->$key, '');
+				if ($key=='refcommande') {
+					print '<input type="text" size="4" name="qty_'.$id.'" id="qty_'.$id.'" value="'.GETPOST('qty_'.$id, 'int').'">';
+				} else {
+					print $object->showOutputField($val, $key, $data->$key, '');
+				}
 				print '</td>';
 				$totalarray['nbfield']++;
+			}
+			if ($key=='pcpid') {
+				print '<input type="hidden" name="pcpid_'.$id.'" id="pcpid_'.$id.'" value="'.$data->pcpid.'">';
 			}
 		}
 	}
 	print '<table>';
+	print '<div class="center"><input type="submit" name="submit" class="button" value="'.$langs->trans('TOCreateOrder').'"></div>';
+	print '</form>';
 }
 
 print '</div>';

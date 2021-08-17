@@ -52,3 +52,4 @@ MyWidgetDescription = Description de mon widget
 TOFillPercentTruck = %% Camion
 TOPalette = Palette
 TPQtyPalette= Qty / Pal
+TOCreateOrder=Créer la commande
