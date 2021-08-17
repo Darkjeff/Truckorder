@@ -30,7 +30,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/commonobject.class.php';
 /**
  * Class for TruckOrder
  */
-class TruckOrder //extends CommonObject
+class TruckOrder extends CommonObject
 {
 	/**
 	 * @var string ID of module.
@@ -63,10 +63,19 @@ class TruckOrder //extends CommonObject
 	 */
 	//public $picto = 'truckorder@truckorder';
 
+	public $fieldsProduct = array(
+		'rowid' => array('type'=>'int', 'sqlfield'=>'p.rowid', 'label'=>'Id', 'enabled'=>'1', 'position'=>1, 'table'=>'product as p', 'visible'=>0,'fetch'=>1),
+		'ref' => array('type'=>'varchar', 'sqlfield'=>'p.ref', 'label'=>'Ref', 'enabled'=>'1', 'position'=>1, 'table'=>'product as p', 'visible'=>1,'fetch'=>1),
+		'label' => array('type'=>'varchar', 'sqlfield'=>'p.label', 'label'=>'Label', 'enabled'=>'1', 'position'=>1, 'table'=>'product as p', 'visible'=>1,'fetch'=>1),
+		'qtepalette' => array('type'=>'integer', 'sqlfield'=>'e.qtepalette', 'label'=>'TPQtyPalette', 'enabled'=>'1', 'position'=>1, 'table'=>'product_extrafields as e', 'visible'=>1,'fetch'=>1 , 'jointype'=>'INNER JOIN', 'joinkey'=>'p.rowid=e.fk_object'),
+		'refcommande' => array('type'=>'varchar', 'label'=>'RefCustomer', 'enabled'=>'1', 'position'=>1, 'table'=>'', 'visible'=>1, 'fetch'=>0),
+		'fill_percent' => array('type'=>'double', 'label'=>'TOFillPercentTruck', 'enabled'=>'1', 'position'=>1, 'table'=>'', 'visible'=>1,'fetch'=>0),
+		'weight' => array('type'=>'double','sqlfield'=>'p.weight', 'label'=>'Weight', 'enabled'=>'1', 'position'=>1, 'table'=>'product as p', 'visible'=>1,'fetch'=>1),
+		'palette' => array('type'=>'integer', 'label'=>'TOPalette', 'enabled'=>'1', 'position'=>1, 'table'=>'product as p', 'visible'=>1,'fetch'=>0),
+		'price' => array('type'=>'price','sqlfield'=>'pcp.price', 'label'=>'PriceUHT', 'enabled'=>'1', 'position'=>1, 'table'=>'product_customer_price as pcp', 'visible'=>1,'fetch'=>1,'jointype'=>'INNER JOIN', 'joinkey'=>'p.rowid=pcp.fk_product'),
+		'fk_soc' => array('type'=>'interger','sqlfield'=>'pcp.fk_soc', 'label'=>'customer', 'enabled'=>'1', 'position'=>1, 'table'=>'product_customer_price as pcp', 'visible'=>0,'fetch'=>1,'jointype'=>'INNER JOIN', 'joinkey'=>'p.rowid=pcp.fk_product'),
+	);
 
-	//const STATUS_DRAFT = 0;
-	//const STATUS_VALIDATED = 1;
-	//const STATUS_CANCELED = 9;
 	/**
 	 * Constructor
 	 *
@@ -106,19 +115,35 @@ class TruckOrder //extends CommonObject
 	 * @param string $filtermode Filter mode (AND or OR)
 	 * @return array|int                 int <0 if KO, array of pages if OK
 	 */
-	public function fetchAll($sortorder = '', $sortfield = '', $limit = 0, $offset = 0, array $filter = array(), $filtermode = 'AND')
+	public function fetchAllProductPrice($sortorder = '', $sortfield = '', $limit = 0, $offset = 0, array $filter = array(), $filtermode = 'AND')
 	{
 		global $conf;
 
 		dol_syslog(__METHOD__, LOG_DEBUG);
 
 		$records = array();
+		$tableSelectFields=array();
+		$tableList=array();
+		$tableJoin=array();
 
 		$sql = 'SELECT ';
-		$sql .= $this->getFieldList('t');
-		$sql .= ' FROM ' . MAIN_DB_PREFIX . $this->table_element . ' as t';
+
+		foreach($this->fieldsProduct as $key=>$fieldData) {
+			if (array_key_exists('fetch', $fieldData) && $fieldData['fetch']>0) {
+				$tableSelectFields[]=$fieldData['sqlfield']. ' as '. $key;
+				if (array_key_exists('table', $fieldData) && !empty($fieldData['table']) && !array_key_exists('jointype', $fieldData)) {
+					$tableList[$fieldData['table']]=MAIN_DB_PREFIX.$fieldData['table'];
+				}
+				if (array_key_exists('jointype', $fieldData) && !empty($fieldData['jointype'])) {
+					$tableJoin[$fieldData['table']] = ' ' . $fieldData['jointype'].' ' . MAIN_DB_PREFIX.$fieldData['table']. ' ON ' . $fieldData['joinkey'];
+				}
+			}
+		}
+		$sql .= implode(',', $tableSelectFields);
+		$sql .= ' FROM (' . implode(',', $tableList).')';
+		$sql .= implode(' ', $tableJoin);
 		if (isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1) {
-			$sql .= ' WHERE t.entity IN (' . getEntity($this->table_element) . ')';
+			$sql .= ' WHERE p.entity IN (' . getEntity('product') . ')';
 		} else {
 			$sql .= ' WHERE 1 = 1';
 		}
@@ -126,7 +151,7 @@ class TruckOrder //extends CommonObject
 		$sqlwhere = array();
 		if (count($filter) > 0) {
 			foreach ($filter as $key => $value) {
-				if ($key == 't.rowid') {
+				if ($key == 'p.rowid' || $key='pcp.fk_soc') {
 					$sqlwhere[] = $key . '=' . $value;
 				} elseif (in_array($this->fields[$key]['type'], array('date', 'datetime', 'timestamp'))) {
 					$sqlwhere[] = $key . ' = \'' . $this->db->idate($value) . '\'';
@@ -149,7 +174,6 @@ class TruckOrder //extends CommonObject
 		if (!empty($limit)) {
 			$sql .= ' ' . $this->db->plimit($limit, $offset);
 		}
-
 		$resql = $this->db->query($sql);
 		if ($resql) {
 			$num = $this->db->num_rows($resql);
@@ -157,10 +181,7 @@ class TruckOrder //extends CommonObject
 			while ($i < ($limit ? min($limit, $num) : $num)) {
 				$obj = $this->db->fetch_object($resql);
 
-				$record = new self($this->db);
-				$record->setVarsFromFetchObj($obj);
-
-				$records[$record->id] = $record;
+				$records[$obj->rowid] = $obj;
 
 				$i++;
 			}
