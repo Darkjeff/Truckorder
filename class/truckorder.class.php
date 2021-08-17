@@ -24,7 +24,7 @@
 
 // Put here all includes required by your class file
 require_once DOL_DOCUMENT_ROOT.'/core/class/commonobject.class.php';
-//require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
+require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
 //require_once DOL_DOCUMENT_ROOT . '/product/class/product.class.php';
 
 /**
@@ -103,6 +103,54 @@ class TruckOrder extends CommonObject
 		//$resultvalidate = $this->validate($user, $notrigger);
 
 		return $resultcreate;
+	}
+
+	/**
+	 * Load list of objects in memory from the database.
+	 *
+	 * @param string $sortorder Sort Order
+	 * @param string $sortfield Sort field
+	 * @param int $limit limit
+	 * @param int $offset Offset
+	 * @param array $filter Filter array. Example array('field'=>'valueforlike', 'customurl'=>...)
+	 * @param string $filtermode Filter mode (AND or OR)
+	 * @return array|int                 int <0 if KO, array of pages if OK
+	 */
+	public function fetchAllProductPriceConsolidated($sortorder = '', $sortfield = '', $limit = 0, $offset = 0, array $filter = array(), $filtermode = 'AND')
+	{
+		$data= array();
+		if (array_key_exists('pcp.fk_soc', $filter) && !empty($filter['pcp.fk_soc'])) {
+			$soc= new Societe($this->db);
+			$resultSoc=  $soc->fetch($filter['pcp.fk_soc']);
+			if ($resultSoc>0) {
+				if (!empty($soc->parent)) {
+					$dataParent = $this->fetchAllProductPrice($sortorder, $sortfield, $limit, $offset, array('pcp.fk_soc'=>$soc->parent), $filtermode);
+					if (!is_array($dataParent) && $dataParent < 0) {
+						return -1;
+					} else {
+						$dataSoc = $this->fetchAllProductPrice($sortorder, $sortfield, $limit, $offset, $filter, $filtermode);
+						if (!is_array($dataParent) && $dataParent < 0) {
+							return -1;
+						} else {
+							if (!empty($dataParent)) {
+								foreach($dataParent as $id => $dataPrd) {
+									$data[$id]=$dataPrd;
+								}
+							}
+							if (!empty($dataSoc)) {
+								foreach($dataSoc as $id => $dataPrd) {
+									$data[$id]=$dataPrd;
+								}
+							}
+						}
+					}
+				}
+			}else {
+				$this->errors[]=$this->error;
+				return -1;
+			}
+		}
+		return $data;
 	}
 
 	/**

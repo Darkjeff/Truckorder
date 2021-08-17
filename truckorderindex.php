@@ -144,7 +144,7 @@ if (empty($reshook)) {
 		} elseif(count($dataProduct)>0) {
 			$nbtotalofrecords = count($dataProduct);
 		*/
-		$dataProduct = $object->fetchAllProductPrice('', '', $limit, $offset, array('pcp.fk_soc' => $socid));
+		$dataProduct = $object->fetchAllProductPriceConsolidated('', '', $limit, $offset, array('pcp.fk_soc' => $socid));
 		if (!is_array($dataProduct) && $dataProduct < 0) {
 			setEventMessages($object->error, $object->errors, 'errors');
 			$dataProduct = null;
