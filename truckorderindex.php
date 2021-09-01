@@ -383,7 +383,7 @@ if (!empty($dataProduct)) {
 				print '<input type="hidden" name="qteprodcam_'.$id.'" id="qteprodcam_'.$id.'" value="'.$data->qteprodcam.'">';
 			}
 			if ($key=='qtepalette') {
-				print '<input type="hidden" name="qtepalette_'.$id.'" id="qtepalette_'.$id.'" value="'.$data->qteprodcam.'">';
+				print '<input type="hidden" name="qtepalette_'.$id.'" id="qtepalette_'.$id.'" value="'.$data->qtepalette.'">';
 			}
 		}
 		print '</tr>';
