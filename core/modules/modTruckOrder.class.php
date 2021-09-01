@@ -173,6 +173,7 @@ class modTruckOrder extends DolibarrModules
 
 		// Array to add new pages in new tabs
 		$this->tabs = array();
+		$this->tabs[] = array('data'=>'order:+order_info:TOInfoCamion:truckorder@truckorder:$user->rights->truckorder->truckorder->read:/truckorder/order_info.php?id=__ID__');  					// To add a new tab identified by code tabname1
 		// Example:
 		// $this->tabs[] = array('data'=>'objecttype:+tabname1:Title1:mylangfile@truckorder:$user->rights->truckorder->read:/truckorder/mynewtab1.php?id=__ID__');  					// To add a new tab identified by code tabname1
 		// $this->tabs[] = array('data'=>'objecttype:+tabname2:SUBSTITUTION_Title2:mylangfile@truckorder:$user->rights->othermodule->read:/truckorder/mynewtab2.php?id=__ID__',  	// To add another new tab identified by code tabname2. Label will be result of calling all substitution functions on 'Title2' key.

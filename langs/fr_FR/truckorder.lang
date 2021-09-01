@@ -53,3 +53,4 @@ TOFillPercentTruck = %% Camion
 TOPalette = Palette
 TPQtyPalette= Qty / Pal
 TOCreateOrder=Créer la commande
+TOInfoCamion=Info. Camion
