@@ -210,6 +210,29 @@ $title = $langs->trans("TruckOrderArea");
 
 llxHeader("", $title);
 
+?>
+	<script type="text/javascript">
+jQuery(document).ready(function() {
+	$(".qtyinput").keyup(function() {
+		let qty = $(this).val();
+
+        let prdId = $(this)[0].id;
+		prdId = prdId.replace("qty_","");
+
+		let prodcam = $("#qteprodcam_"+prdId).val();
+		if (prodcam!=='' && prodcam!==0 && prodcam!=='0') {
+        	$("#fill_percent_"+prdId).text(Math.round((qty/prodcam)*100)/100);
+		}
+
+		let pallet = $("#qtepalette_"+prdId).val();
+		if (pallet!=='' && pallet!==0 && pallet!=='0') {
+			$("#palette_"+prdId).text(Math.round((qty/pallet)*100)/100);
+		}
+
+	});
+});
+</script>';
+<?php
 print load_fiche_titre($title, '', 'truckorder.png@truckorder');
 
 print '<div class="fichecenter">';
@@ -340,9 +363,15 @@ if (!empty($dataProduct)) {
 			if (array_key_exists('visible', $val) && $val['visible']>0) {
 				print '<td'.($cssforfield ? ' class="'.$cssforfield.'"' : '').'>';
 				if ($key=='refcommande') {
-					print '<input type="text" size="4" name="qty_'.$id.'" id="qty_'.$id.'" value="'.GETPOST('qty_'.$id, 'int').'">';
+					print '<input type="text" class="qtyinput" size="4" name="qty_'.$id.'" id="qty_'.$id.'" value="'.GETPOST('qty_'.$id, 'int').'">';
 				} else {
 					print $object->showOutputField($val, $key, $data->$key, '');
+				}
+				if ($key=='fill_percent') {
+					print '<span name="fill_percent_'.$id.'" id="fill_percent_'.$id.'"></span>';
+				}
+				if ($key=='palette') {
+					print '<span name="palette_'.$id.'" id="palette_'.$id.'"></span>';
 				}
 				print '</td>';
 				$totalarray['nbfield']++;
@@ -350,8 +379,40 @@ if (!empty($dataProduct)) {
 			if ($key=='pcpid') {
 				print '<input type="hidden" name="pcpid_'.$id.'" id="pcpid_'.$id.'" value="'.$data->pcpid.'">';
 			}
+			if ($key=='qteprodcam') {
+				print '<input type="hidden" name="qteprodcam_'.$id.'" id="qteprodcam_'.$id.'" value="'.$data->qteprodcam.'">';
+			}
+			if ($key=='qtepalette') {
+				print '<input type="hidden" name="qtepalette_'.$id.'" id="qtepalette_'.$id.'" value="'.$data->qteprodcam.'">';
+			}
+		}
+		print '</tr>';
+	}
+	print '<tr class="liste_total">';
+	foreach ($object->fieldsProduct as $key => $val) {
+		if (array_key_exists('visible', $val) && $val['visible']>0) {
+			$cssforfield = 'center';
+
+			if (in_array($val['type'], array('timestamp'))) {
+				$cssforfield .= ($cssforfield ? ' ' : '').'nowrap';
+			} elseif ($key == 'ref') {
+				$cssforfield .= ($cssforfield ? ' ' : '').'nowrap';
+			}
+
+			if (in_array($val['type'], array('double(24,8)', 'double(6,3)', 'integer', 'real', 'price')) && !in_array($key, array('rowid', 'status')) && empty($val['arrayofkeyval'])) {
+				$cssforfield .= ($cssforfield ? ' ' : '').'right';
+			}
+			print '<td'.($cssforfield ? ' class="'.$cssforfield.'"' : '').'>';
+
+			print '<span name="total_'.$key.'" id="total_'.$key.'">';
+			if ($key=='ref') {
+				print $langs->trans('Total');
+			}
+			print '</span>';
+			print '</td>';
 		}
 	}
+	print '</tr>';
 	print '<table>';
 	print '<div class="center"><input type="submit" name="submit" class="button" value="'.$langs->trans('TOCreateOrder').'"></div>';
 	print '</form>';
