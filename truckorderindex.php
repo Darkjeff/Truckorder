@@ -214,43 +214,54 @@ llxHeader("", $title);
 <script type="text/javascript">
 jQuery(document).ready(function() {
 	$(".qtyinput").keyup(function() {
-		let qty = $(this).val();
+			let qty = $(this).val();
+			if (qty > 0) {
+				let prdId = $(this)[0].id;
+				prdId = prdId.replace("qty_", "");
 
-        let prdId = $(this)[0].id;
-		prdId = prdId.replace("qty_","");
+				let prodcam = $("#qteprodcam_" + prdId).val();
+				if (prodcam !== '' && prodcam !== 0 && prodcam !== '0') {
+					$("#fill_percent_" + prdId).text(Math.round((qty / prodcam) * 100) / 100);
+				}
 
-		let prodcam = $("#qteprodcam_"+prdId).val();
-		if (prodcam!=='' && prodcam!==0 && prodcam!=='0') {
-        	$("#fill_percent_"+prdId).text(Math.round((qty/prodcam)*100)/100);
-		}
+				let pallet = $("#qtepalette_" + prdId).val();
+				if (pallet !== '' && pallet !== 0 && pallet !== '0') {
+					$("#palette_" + prdId).text(Math.round((qty / pallet) * 100) / 100);
+				}
 
-		let pallet = $("#qtepalette_"+prdId).val();
-		if (pallet!=='' && pallet!==0 && pallet!=='0') {
-			$("#palette_"+prdId).text(Math.round((qty/pallet)*100)/100);
-		}
+				//Calc total
+				let prdsIds = JSON.parse($("#ProdIdArray").val());
+				let totalPercent = 0;
+				let totalPalette = 0;
+				let totalWeight = 0;
+				prdsIds.forEach(function (prd) {
+						fillper = parseFloat($("#fill_percent_" + prd).text());
+						if (!isNaN(fillper)) {
+							totalPercent += fillper;
+						}
+						pal = parseFloat($("#palette_" + prd).text());
+						if (!isNaN(pal)) {
+							totalPalette += pal;
+						}
 
-		//Calc total
+					//	console.log("#weight_" + prd);
 
-		let prdsIds = JSON.parse($("#ProdIdArray").val());
-		let totalPercent = 0;
-		let totalPalette = 0;
-		prdsIds.forEach(function(prd) {
-			fillper=parseFloat($("#fill_percent_"+prd).text());
-			if (!isNaN(fillper)) {
-				totalPercent += fillper;
-			}
-			pal=parseFloat($("#palette_"+prd).text());
-			if (!isNaN(pal)) {
-				totalPalette += pal;
+						qtyloc = parseFloat($("#qty_" + prd).val());
+						if (!isNaN(qtyloc)) {
+							weight = parseFloat($("#weight_" + prd).val()) * qtyloc;
+
+							if (!isNaN(weight)) {
+								totalWeight += weight;
+							}
+						}
+						console.log(qtyloc);
+					}
+				);
+				$("#total_fill_percent").text(Math.round(totalPercent * 100) / 100);
+				$("#total_palette").text(Math.round(totalPalette * 100) / 100);
+				$("#total_weight").text(Math.round(totalWeight * 100) / 100);
 			}
 		});
-		$("#total_fill_percent").text(Math.round(totalPercent*100)/100);
-		$("#total_palette").text(Math.round(totalPalette*100)/100);
-
-
-
-
-	});
 });
 </script>';
 <?php
@@ -406,6 +417,9 @@ if (!empty($dataProduct)) {
 			}
 			if ($key=='qtepalette') {
 				print '<input type="hidden" name="qtepalette_'.$id.'" id="qtepalette_'.$id.'" value="'.$data->qtepalette.'">';
+			}
+			if ($key=='weight') {
+				print '<input type="hidden" name="weight_'.$id.'" id="weight_'.$id.'" value="'.$data->weight.'">';
 			}
 		}
 		print '</tr>';
