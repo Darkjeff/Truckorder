@@ -234,6 +234,7 @@ jQuery(document).ready(function() {
 				let totalPercent = 0;
 				let totalPalette = 0;
 				let totalWeight = 0;
+				let totalVolume = 0;
 				prdsIds.forEach(function (prd) {
 						fillper = parseFloat($("#fill_percent_" + prd).text());
 						if (!isNaN(fillper)) {
@@ -247,9 +248,13 @@ jQuery(document).ready(function() {
 						qtyloc = parseFloat($("#qty_" + prd).val());
 						if (!isNaN(qtyloc)) {
 							weight = parseFloat($("#weight_" + prd).val()) * qtyloc;
+							volume = parseFloat($("#volume_" + prd).val()) * qtyloc;
 
 							if (!isNaN(weight)) {
 								totalWeight += weight;
+							}
+							if (!isNaN(volume)) {
+								totalVolume += volume;
 							}
 						}
 					}
@@ -257,6 +262,7 @@ jQuery(document).ready(function() {
 				$("#total_fill_percent").text(Math.round(totalPercent * 100) / 100);
 				$("#total_palette").text(Math.round(totalPalette * 100) / 100);
 				$("#total_weight").text(Math.round(totalWeight * 100) / 100);
+				$("#total_volume").text(Math.round(totalVolume * 100) / 100);
 			}
 		});
 });
@@ -414,6 +420,15 @@ if (!empty($dataProduct)) {
 			}
 			if ($key=='qtepalette') {
 				print '<input type="hidden" name="qtepalette_'.$id.'" id="qtepalette_'.$id.'" value="'.$data->qtepalette.'">';
+			}
+			if ($key=='weight') {
+				print '<input type="hidden" name="weight_'.$id.'" id="weight_'.$id.'" value="'.$data->weight.'">';
+			}
+			if ($key=='volume') {
+				print '<input type="hidden" name="volume_'.$id.'" id="volume_'.$id.'" value="'.$data->volume.'">';
+			}
+			if ($key=='volume_unit') {
+				print '<input type="hidden" name="volume_unit_'.$id.'" id="volume_unit'.$id.'" value="'.$data->volume_unit.'">';
 			}
 			if ($key=='weight') {
 				print '<input type="hidden" name="weight_'.$id.'" id="weight_'.$id.'" value="'.$data->weight.'">';

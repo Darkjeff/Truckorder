@@ -71,6 +71,8 @@ class TruckOrder extends CommonObject
 		'refcommande' => array('type'=>'varchar', 'label'=>'RefCustomer', 'enabled'=>'1', 'position'=>1, 'table'=>'', 'visible'=>1, 'fetch'=>0),
 		'fill_percent' => array('type'=>'double', 'label'=>'TOFillPercentTruck', 'enabled'=>'1', 'position'=>1, 'table'=>'', 'visible'=>1,'fetch'=>0),
 		'weight' => array('type'=>'double','sqlfield'=>'p.weight', 'label'=>'Weight', 'enabled'=>'1', 'position'=>1, 'table'=>'product as p', 'visible'=>1,'fetch'=>1),
+		'volume' => array('type'=>'double','sqlfield'=>'p.volume', 'label'=>'Volume', 'enabled'=>'1', 'position'=>1, 'table'=>'product as p', 'visible'=>1,'fetch'=>1),
+		'volume_unit' => array('type'=>'double','sqlfield'=>'p.volume_units', 'label'=>'VolumeUnit', 'enabled'=>'1', 'position'=>1, 'table'=>'product as p', 'visible'=>0,'fetch'=>1),
 		'palette' => array('type'=>'integer', 'label'=>'TOPalette', 'enabled'=>'1', 'position'=>1, 'table'=>'product as p', 'visible'=>1,'fetch'=>0),
 		'price' => array('type'=>'price','sqlfield'=>'pcp.price', 'label'=>'PriceUHT', 'enabled'=>'1', 'position'=>1, 'table'=>'product_customer_price as pcp', 'visible'=>1,'fetch'=>1,'jointype'=>'INNER JOIN', 'joinkey'=>'p.rowid=pcp.fk_product'),
 		//'fk_soc' => array('type'=>'interger','sqlfield'=>'pcp.fk_soc', 'label'=>'customer', 'enabled'=>'1', 'position'=>1, 'table'=>'product_customer_price as pcp', 'visible'=>0,'fetch'=>1,'jointype'=>'INNER JOIN', 'joinkey'=>'p.rowid=pcp.fk_product'),
