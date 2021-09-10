@@ -229,6 +229,17 @@ jQuery(document).ready(function() {
 					$("#palette_" + prdId).text(Math.round((qty / pallet) * 100) / 100);
 				}
 
+				let weight_line = $("#weight_" + prdId).val();
+				if (weight_line !== '' && weight_line !== 0 && weight_line !== '0') {
+					$("#weight_line_" + prdId).text(Math.round((qty * weight_line) * 100) / 100);
+				}
+
+				let volume_line = $("#volume_" + prdId).val();
+				if (volume_line !== '' && volume_line !== 0 && volume_line !== '0') {
+					$("#volume_line_" + prdId).text(Math.round((qty * volume_line) * 100) / 100);
+				}
+
+
 				//Calc total
 				let prdsIds = JSON.parse($("#ProdIdArray").val());
 				let totalPercent = 0;
@@ -261,8 +272,8 @@ jQuery(document).ready(function() {
 				);
 				$("#total_fill_percent").text(Math.round(totalPercent * 100) / 100);
 				$("#total_palette").text(Math.round(totalPalette * 100) / 100);
-				$("#total_weight").text(Math.round(totalWeight * 100) / 100);
-				$("#total_volume").text(Math.round(totalVolume * 100) / 100);
+				$("#total_weight_line").text(Math.round(totalWeight * 100) / 100);
+				$("#total_volume_line").text(Math.round(totalVolume * 100) / 100);
 			}
 		});
 });
@@ -407,6 +418,12 @@ if (!empty($dataProduct)) {
 				}
 				if ($key=='palette') {
 					print '<span name="palette_'.$id.'" id="palette_'.$id.'"></span>';
+				}
+				if ($key=='volume_line') {
+					print '<span name="volume_line_'.$id.'" id="volume_line_'.$id.'"></span>';
+				}
+				if ($key=='weight_line') {
+					print '<span name="weight_line_'.$id.'" id="weight_line_'.$id.'"></span>';
 				}
 				print '</td>';
 				$totalarray['nbfield']++;
