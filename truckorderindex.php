@@ -211,7 +211,7 @@ $title = $langs->trans("TruckOrderArea");
 llxHeader("", $title);
 
 ?>
-	<script type="text/javascript">
+<script type="text/javascript">
 jQuery(document).ready(function() {
 	$(".qtyinput").keyup(function() {
 		let qty = $(this).val();
@@ -228,6 +228,27 @@ jQuery(document).ready(function() {
 		if (pallet!=='' && pallet!==0 && pallet!=='0') {
 			$("#palette_"+prdId).text(Math.round((qty/pallet)*100)/100);
 		}
+
+		//Calc total
+
+		let prdsIds = JSON.parse($("#ProdIdArray").val());
+		let totalPercent = 0;
+		let totalPalette = 0;
+		prdsIds.forEach(function(prd) {
+			fillper=parseFloat($("#fill_percent_"+prd).text());
+			if (!isNaN(fillper)) {
+				totalPercent += fillper;
+			}
+			pal=parseFloat($("#palette_"+prd).text());
+			if (!isNaN(pal)) {
+				totalPalette += pal;
+			}
+		});
+		$("#total_fill_percent").text(Math.round(totalPercent*100)/100);
+		$("#total_palette").text(Math.round(totalPalette*100)/100);
+
+
+
 
 	});
 });
@@ -322,7 +343,6 @@ if (!empty($dataProduct)) {
 	print '<input type="hidden" name="cmd_dt_c" value="'.$cmd_dt.'">';
 	print '<input type="hidden" name="ref_client" value="'.$ref_client.'">';
 
-
 	//$newcardbutton = dolGetButtonTitle($langs->trans('New'), '', 'fa fa-plus-circle', dol_buildpath('/bibliotheque/livre_card.php', 1).'?action=create&backtopage='.urlencode($_SERVER['PHP_SELF']), '', $permissiontoadd);
 	$newcardbutton='';
 
@@ -344,6 +364,7 @@ if (!empty($dataProduct)) {
 	$totalarray = array();
 	$totalarray['nbfield'] = 0;
 
+	$idProd = array();
 	foreach($dataProduct as $id=>$data) {
 		print '<tr class="oddeven">';
 		foreach ($object->fieldsProduct as $key => $val) {
@@ -381,6 +402,7 @@ if (!empty($dataProduct)) {
 			}
 			if ($key=='qteprodcam') {
 				print '<input type="hidden" name="qteprodcam_'.$id.'" id="qteprodcam_'.$id.'" value="'.$data->qteprodcam.'">';
+				$idProd[]=$id;
 			}
 			if ($key=='qtepalette') {
 				print '<input type="hidden" name="qtepalette_'.$id.'" id="qtepalette_'.$id.'" value="'.$data->qtepalette.'">';
@@ -415,6 +437,7 @@ if (!empty($dataProduct)) {
 	print '</tr>';
 	print '<table>';
 	print '<div class="center"><input type="submit" name="submit" class="button" value="'.$langs->trans('TOCreateOrder').'"></div>';
+	print '<input type="hidden" name="ProdIdArray" id="ProdIdArray" value="'.json_encode($idProd).'">';
 	print '</form>';
 }
 
