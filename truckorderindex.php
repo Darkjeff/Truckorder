@@ -244,8 +244,6 @@ jQuery(document).ready(function() {
 							totalPalette += pal;
 						}
 
-					//	console.log("#weight_" + prd);
-
 						qtyloc = parseFloat($("#qty_" + prd).val());
 						if (!isNaN(qtyloc)) {
 							weight = parseFloat($("#weight_" + prd).val()) * qtyloc;
@@ -254,7 +252,6 @@ jQuery(document).ready(function() {
 								totalWeight += weight;
 							}
 						}
-						console.log(qtyloc);
 					}
 				);
 				$("#total_fill_percent").text(Math.round(totalPercent * 100) / 100);
