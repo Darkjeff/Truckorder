@@ -160,7 +160,7 @@ if (empty($reshook)) {
 		$order->date=$cmd_dt_c;
 		$order->ref_client=$ref_client;
 		$order->modelpdf=$conf->global->COMMANDE_ADDON_PDF;
-		foreach($_POST as $key=>$val) {
+		foreach ($_POST as $key=>$val) {
 			if (strpos($key, 'qty_') !== false && !empty(GETPOST($key))) {
 				$pcp = new Productcustomerprice($db);
 				$prod = new Product($db);
@@ -277,7 +277,7 @@ jQuery(document).ready(function() {
 			}
 		});
 });
-</script>';
+</script>
 <?php
 print load_fiche_titre($title, '', 'truckorder.png@truckorder');
 
@@ -390,7 +390,7 @@ if (!empty($dataProduct)) {
 	$totalarray['nbfield'] = 0;
 
 	$idProd = array();
-	foreach($dataProduct as $id=>$data) {
+	foreach ($dataProduct as $id=>$data) {
 		print '<tr class="oddeven">';
 		foreach ($object->fieldsProduct as $key => $val) {
 			$cssforfield = 'center';

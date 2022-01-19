@@ -659,7 +659,7 @@ class pdf_espadon_truckorder extends ModelePdfExpedition
 							if ($resultFetch<0) {
 								setEventMessages($prod->error, $prod->errors, 'errors');
 							} elseif (!empty($prod->array_options['options_qtepalette'])) {
-								$qty_shipped .= '<br />'.$object->lines[$i]->qty_shipped/$prod->array_options['options_qtepalette'] . ' Palettes';
+								$qty_shipped .= '<br />'.$object->lines[$i]->qty_shipped/$prod->array_options['options_qtepalette'] . ' Palette(s)';
 							}
 						}
 						$this->printStdColumnContent($pdf, $curY, 'qty_shipped', $qty_shipped);
