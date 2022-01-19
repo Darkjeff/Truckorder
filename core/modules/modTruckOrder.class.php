@@ -100,7 +100,7 @@ class modTruckOrder extends DolibarrModules
 			// Set this to 1 if module has its own barcode directory (core/modules/barcode)
 			'barcode' => 0,
 			// Set this to 1 if module has its own models directory (core/modules/xxx)
-			'models' => 0,
+			'models' => 1,
 			// Set this to 1 if module has its own printing directory (core/modules/printing)
 			'printing' => 0,
 			// Set this to 1 if module has its own theme directory (theme)
@@ -347,46 +347,46 @@ class modTruckOrder extends DolibarrModules
 		);
 		*/
 
-        $this->menu[$r++]=array(
-            // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
-            'fk_menu'=>'fk_mainmenu=truckorder',
-            // This is a Left menu entry
-            'type'=>'left',
-            'titre'=>'List TruckOrder',
-            'mainmenu'=>'truckorder',
-            'leftmenu'=>'truckorder_truckorder',
-            'url'=>'/truckorder/truckorder_list.php',
-            // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
-            'langs'=>'truckorder@truckorder',
-            'position'=>1100+$r,
-            // Define condition to show or hide menu entry. Use '$conf->truckorder->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
-            'enabled'=>'$conf->truckorder->enabled',
-            // Use 'perms'=>'$user->rights->truckorder->level1->level2' if you want your menu with a permission rules
-            'perms'=>'1',
-            'target'=>'',
-            // 0=Menu for internal users, 1=external users, 2=both
-            'user'=>2,
-        );
-        $this->menu[$r++]=array(
-            // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
-            'fk_menu'=>'fk_mainmenu=truckorder,fk_leftmenu=truckorder_truckorder',
-            // This is a Left menu entry
-            'type'=>'left',
-            'titre'=>'New TruckOrder',
-            'mainmenu'=>'truckorder',
-            'leftmenu'=>'truckorder_truckorder',
-            'url'=>'/truckorder/truckorder_card.php?action=create',
-            // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
-            'langs'=>'truckorder@truckorder',
-            'position'=>1100+$r,
-            // Define condition to show or hide menu entry. Use '$conf->truckorder->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
-            'enabled'=>'$conf->truckorder->enabled',
-            // Use 'perms'=>'$user->rights->truckorder->level1->level2' if you want your menu with a permission rules
-            'perms'=>'1',
-            'target'=>'',
-            // 0=Menu for internal users, 1=external users, 2=both
-            'user'=>2
-        );
+		$this->menu[$r++]=array(
+			// '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
+			'fk_menu'=>'fk_mainmenu=truckorder',
+			// This is a Left menu entry
+			'type'=>'left',
+			'titre'=>'List TruckOrder',
+			'mainmenu'=>'truckorder',
+			'leftmenu'=>'truckorder_truckorder',
+			'url'=>'/truckorder/truckorder_list.php',
+			// Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+			'langs'=>'truckorder@truckorder',
+			'position'=>1100+$r,
+			// Define condition to show or hide menu entry. Use '$conf->truckorder->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+			'enabled'=>'$conf->truckorder->enabled',
+			// Use 'perms'=>'$user->rights->truckorder->level1->level2' if you want your menu with a permission rules
+			'perms'=>'1',
+			'target'=>'',
+			// 0=Menu for internal users, 1=external users, 2=both
+			'user'=>2,
+		);
+		$this->menu[$r++]=array(
+			// '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
+			'fk_menu'=>'fk_mainmenu=truckorder,fk_leftmenu=truckorder_truckorder',
+			// This is a Left menu entry
+			'type'=>'left',
+			'titre'=>'New TruckOrder',
+			'mainmenu'=>'truckorder',
+			'leftmenu'=>'truckorder_truckorder',
+			'url'=>'/truckorder/truckorder_card.php?action=create',
+			// Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+			'langs'=>'truckorder@truckorder',
+			'position'=>1100+$r,
+			// Define condition to show or hide menu entry. Use '$conf->truckorder->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+			'enabled'=>'$conf->truckorder->enabled',
+			// Use 'perms'=>'$user->rights->truckorder->level1->level2' if you want your menu with a permission rules
+			'perms'=>'1',
+			'target'=>'',
+			// 0=Menu for internal users, 1=external users, 2=both
+			'user'=>2
+		);
 
 		/* END MODULEBUILDER LEFTMENU TRUCKORDER */
 		$this->menu[$r++]=array(
@@ -496,13 +496,11 @@ class modTruckOrder extends DolibarrModules
 				$dirodt = DOL_DATA_ROOT.'/doctemplates/truckorder';
 				$dest = $dirodt.'/template_truckorders.odt';
 
-				if (file_exists($src) && !file_exists($dest))
-				{
+				if (file_exists($src) && !file_exists($dest)) {
 					require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
 					dol_mkdir($dirodt);
 					$result = dol_copy($src, $dest, 0, 0);
-					if ($result < 0)
-					{
+					if ($result < 0) {
 						$langs->load("errors");
 						$this->error = $langs->trans('ErrorFailToCopyFile', $src, $dest);
 						return 0;
