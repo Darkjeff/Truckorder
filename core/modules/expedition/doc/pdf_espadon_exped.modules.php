@@ -21,20 +21,20 @@
  */
 
 /**
- *	\file       truckorder/expedition/doc/pdf_espadon.modules.php
- *	\ingroup    expedition
- *	\brief      Class file allowing Espadons shipping template generation
+ *    \file       truckorder/expedition/doc/pdf_espadon.modules.php
+ *    \ingroup    expedition
+ *    \brief      Class file allowing Espadons shipping template generation
  */
 
-require_once DOL_DOCUMENT_ROOT.'/core/modules/expedition/modules_expedition.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/pdf.lib.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/modules/expedition/modules_expedition.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/pdf.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/functions2.lib.php';
 
 /**
- *	Class to build sending documents with model espadon
+ *    Class to build sending documents with model espadon
  */
-class pdf_espadon_truckorder extends ModelePdfExpedition
+class pdf_espadon_exped extends ModelePdfExpedition
 {
 	/**
 	 * @var DoliDb Database handler
@@ -116,16 +116,16 @@ class pdf_espadon_truckorder extends ModelePdfExpedition
 
 
 	/**
-	 *	Constructor
+	 *    Constructor
 	 *
-	 *	@param	DoliDB	$db		Database handler
+	 * @param DoliDB $db Database handler
 	 */
 	public function __construct($db = 0)
 	{
 		global $conf, $langs, $mysoc;
 
 		$this->db = $db;
-		$this->name = "espadon_truckorder";
+		$this->name = "espadon_exped";
 		$this->description = $langs->trans("DocumentModelStandardPDF");
 		$this->update_main_doc_field = 1; // Save the name of generated file as the main doc when generating a doc with this template
 
@@ -151,16 +151,17 @@ class pdf_espadon_truckorder extends ModelePdfExpedition
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
 	/**
-	 *	Function to build pdf onto disk
+	 *    Function to build pdf onto disk
 	 *
-	 *	@param		Expedition	$object			    Object expedition to generate (or id if old method)
-	 *	@param		Translate	$outputlangs		Lang output object
-	 *  @param		string		$srctemplatepath	Full path of source filename for generator using a template file
-	 *  @param		int			$hidedetails		Do not show line details
-	 *  @param		int			$hidedesc			Do not show desc
-	 *  @param		int			$hideref			Do not show ref
-	 *  @return     int         	    			1=OK, 0=KO
+	 * @param Expedition $object Object expedition to generate (or id if old method)
+	 * @param Translate $outputlangs Lang output object
+	 * @param string $srctemplatepath Full path of source filename for generator using a template file
+	 * @param int $hidedetails Do not show line details
+	 * @param int $hidedesc Do not show desc
+	 * @param int $hideref Do not show ref
+	 * @return     int                            1=OK, 0=KO
 	 */
 	public function write_file($object, $outputlangs, $srctemplatepath = '', $hidedetails = 0, $hidedesc = 0, $hideref = 0)
 	{
@@ -204,17 +205,17 @@ class pdf_espadon_truckorder extends ModelePdfExpedition
 				$objphoto->fetch($object->lines[$i]->fk_product);
 
 				if (!empty($conf->global->PRODUCT_USE_OLD_PATH_FOR_PHOTO)) {
-					$pdir = get_exdir($object->lines[$i]->fk_product, 2, 0, 0, $objphoto, 'product').$object->lines[$i]->fk_product."/photos/";
-					$dir = $conf->product->dir_output.'/'.$pdir;
+					$pdir = get_exdir($object->lines[$i]->fk_product, 2, 0, 0, $objphoto, 'product') . $object->lines[$i]->fk_product . "/photos/";
+					$dir = $conf->product->dir_output . '/' . $pdir;
 				} else {
 					$pdir = get_exdir(0, 0, 0, 0, $objphoto, 'product');
-					$dir = $conf->product->dir_output.'/'.$pdir;
+					$dir = $conf->product->dir_output . '/' . $pdir;
 				}
 
 				$realpath = '';
 
 				foreach ($objphoto->liste_photos($dir, 1) as $key => $obj) {
-					if (empty($conf->global->CAT_HIGH_QUALITY_IMAGES)) {		// If CAT_HIGH_QUALITY_IMAGES not defined, we use thumb if defined and then original photo
+					if (empty($conf->global->CAT_HIGH_QUALITY_IMAGES)) {        // If CAT_HIGH_QUALITY_IMAGES not defined, we use thumb if defined and then original photo
 						if ($obj['photo_vignette']) {
 							$filename = $obj['photo_vignette'];
 						} else {
@@ -224,7 +225,7 @@ class pdf_espadon_truckorder extends ModelePdfExpedition
 						$filename = $obj['photo'];
 					}
 
-					$realpath = $dir.$filename;
+					$realpath = $dir . $filename;
 					$this->atleastonephoto = true;
 					break;
 				}
@@ -242,12 +243,12 @@ class pdf_espadon_truckorder extends ModelePdfExpedition
 		if ($conf->expedition->dir_output) {
 			// Definition of $dir and $file
 			if ($object->specimen) {
-				$dir = $conf->expedition->dir_output."/sending";
-				$file = $dir."/SPECIMEN.pdf";
+				$dir = $conf->expedition->dir_output . "/sending";
+				$file = $dir . "/SPECIMEN.pdf";
 			} else {
 				$expref = dol_sanitizeFileName($object->ref);
-				$dir = $conf->expedition->dir_output."/sending/".$expref;
-				$file = $dir."/".$expref.".pdf";
+				$dir = $conf->expedition->dir_output . "/sending/" . $expref;
+				$file = $dir . "/" . $expref . ".pdf";
 			}
 
 			if (!file_exists($dir)) {
@@ -260,11 +261,11 @@ class pdf_espadon_truckorder extends ModelePdfExpedition
 			if (file_exists($dir)) {
 				// Add pdfgeneration hook
 				if (!is_object($hookmanager)) {
-					include_once DOL_DOCUMENT_ROOT.'/core/class/hookmanager.class.php';
+					include_once DOL_DOCUMENT_ROOT . '/core/class/hookmanager.class.php';
 					$hookmanager = new HookManager($this->db);
 				}
 				$hookmanager->initHooks(array('pdfgeneration'));
-				$parameters = array('file'=>$file, 'object'=>$object, 'outputlangs'=>$outputlangs);
+				$parameters = array('file' => $file, 'object' => $object, 'outputlangs' => $outputlangs);
 				global $action;
 				$reshook = $hookmanager->executeHooks('beforePDFCreation', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks
 
@@ -288,7 +289,7 @@ class pdf_espadon_truckorder extends ModelePdfExpedition
 				$pdf->SetFont(pdf_getPDFFont($outputlangs));
 				// Set path to the background PDF File
 				if (!empty($conf->global->MAIN_ADD_PDF_BACKGROUND)) {
-					$pagecount = $pdf->setSourceFile($conf->mycompany->dir_output.'/'.$conf->global->MAIN_ADD_PDF_BACKGROUND);
+					$pagecount = $pdf->setSourceFile($conf->mycompany->dir_output . '/' . $conf->global->MAIN_ADD_PDF_BACKGROUND);
 					$tplidx = $pdf->importPage(1);
 				}
 
@@ -302,9 +303,9 @@ class pdf_espadon_truckorder extends ModelePdfExpedition
 
 				$pdf->SetTitle($outputlangs->convToOutputCharset($object->ref));
 				$pdf->SetSubject($outputlangs->transnoentities("Shipment"));
-				$pdf->SetCreator("Dolibarr ".DOL_VERSION);
+				$pdf->SetCreator("Dolibarr " . DOL_VERSION);
 				$pdf->SetAuthor($outputlangs->convToOutputCharset($user->getFullName($outputlangs)));
-				$pdf->SetKeyWords($outputlangs->convToOutputCharset($object->ref)." ".$outputlangs->transnoentities("Shipment"));
+				$pdf->SetKeyWords($outputlangs->convToOutputCharset($object->ref) . " " . $outputlangs->transnoentities("Shipment"));
 				if (!empty($conf->global->MAIN_DISABLE_PDF_COMPRESSION)) {
 					$pdf->SetCompression(false);
 				}
@@ -323,13 +324,14 @@ class pdf_espadon_truckorder extends ModelePdfExpedition
 				$pdf->SetTextColor(0, 0, 0);
 
 				$tab_top = 90;
-				$tab_top_newpage = (empty($conf->global->MAIN_PDF_DONOTREPEAT_HEAD) ? 42 + $top_shift: 10);
+				$tab_top_newpage = (empty($conf->global->MAIN_PDF_DONOTREPEAT_HEAD) ? 42 + $top_shift : 10);
 				$tab_height = 130;
 				$tab_height_newpage = 150;
 
 				$this->posxdesc = $this->marge_gauche + 1;
 
 				$qty_palette = 0;
+				$nb_palette_total=0;
 
 				// Incoterm
 				$height_incoterms = 0;
@@ -377,9 +379,9 @@ class pdf_espadon_truckorder extends ModelePdfExpedition
 								$code = $outputlangs->getLabelFromKey($this->db, $object->shipping_method_id, 'c_shipment_mode', 'rowid', 'code');
 								$label = '';
 								if ($object->tracking_url != $object->tracking_number) {
-									$label .= $outputlangs->trans("LinkToTrackYourPackage")."<br>";
+									$label .= $outputlangs->trans("LinkToTrackYourPackage") . "<br>";
 								}
-								$label .= $outputlangs->trans("SendingMethod").": ".$outputlangs->trans("SendingMethod".strtoupper($code));
+								$label .= $outputlangs->trans("SendingMethod") . ": " . $outputlangs->trans("SendingMethod" . strtoupper($code));
 								//var_dump($object->tracking_url != $object->tracking_number);exit;
 								if ($object->tracking_url != $object->tracking_number) {
 									$label .= " : ";
@@ -439,7 +441,7 @@ class pdf_espadon_truckorder extends ModelePdfExpedition
 
 							$posyafter = $pdf->GetY();
 
-							if ($posyafter > ($this->page_hauteur - ($heightforfooter + $heightforfreetext + 20))) {	// There is no space left for total+free text
+							if ($posyafter > ($this->page_hauteur - ($heightforfooter + $heightforfreetext + 20))) {    // There is no space left for total+free text
 								$pdf->AddPage('', '', true);
 								$pagenb++;
 								$pageposafternote++;
@@ -544,7 +546,7 @@ class pdf_espadon_truckorder extends ModelePdfExpedition
 
 					if ($this->getColumnStatus('photo')) {
 						// We start with Photo of product line
-						if (isset($imglinesize['width']) && isset($imglinesize['height']) && ($curY + $imglinesize['height']) > ($this->page_hauteur - ($heightforfooter + $heightforfreetext + $heightforsignature + $heightforinfotot))) {	// If photo too high, we moved completely on new page
+						if (isset($imglinesize['width']) && isset($imglinesize['height']) && ($curY + $imglinesize['height']) > ($this->page_hauteur - ($heightforfooter + $heightforfreetext + $heightforsignature + $heightforinfotot))) {    // If photo too high, we moved completely on new page
 							$pdf->AddPage('', '', true);
 							if (!empty($tplidx)) {
 								$pdf->useTemplate($tplidx);
@@ -577,7 +579,7 @@ class pdf_espadon_truckorder extends ModelePdfExpedition
 						$this->printColDescContent($pdf, $curY, 'desc', $object, $i, $outputlangs, $hideref, $hidedesc);
 
 						$pageposafter = $pdf->getPage();
-						if ($pageposafter > $pageposbefore) {	// There is a pagebreak
+						if ($pageposafter > $pageposbefore) {    // There is a pagebreak
 							$pdf->rollbackTransaction(true);
 
 							$this->printColDescContent($pdf, $curY, 'desc', $object, $i, $outputlangs, $hideref, $hidedesc);
@@ -585,8 +587,8 @@ class pdf_espadon_truckorder extends ModelePdfExpedition
 							$pageposafter = $pdf->getPage();
 							$posyafter = $pdf->GetY();
 							//var_dump($posyafter); var_dump(($this->page_hauteur - ($heightforfooter+$heightforfreetext+$heightforinfotot))); exit;
-							if ($posyafter > ($this->page_hauteur - ($heightforfooter + $heightforfreetext + $heightforsignature + $heightforinfotot))) {	// There is no space left for total+free text
-								if ($i == ($nblines - 1)) {	// No more lines, and no space left to show total, so we create a new page
+							if ($posyafter > ($this->page_hauteur - ($heightforfooter + $heightforfreetext + $heightforsignature + $heightforinfotot))) {    // There is no space left for total+free text
+								if ($i == ($nblines - 1)) {    // No more lines, and no space left to show total, so we create a new page
 									$pdf->AddPage('', '', true);
 									if (!empty($tplidx)) {
 										$pdf->useTemplate($tplidx);
@@ -635,16 +637,15 @@ class pdf_espadon_truckorder extends ModelePdfExpedition
 
 					$weighttxt = '';
 					if ($object->lines[$i]->fk_product_type == 0 && $object->lines[$i]->weight) {
-						$weighttxt = round($object->lines[$i]->weight * $object->lines[$i]->qty_shipped, 5).' '.measuringUnitString(0, "weight", $object->lines[$i]->weight_units, 1);
+						$weighttxt = round($object->lines[$i]->weight * $object->lines[$i]->qty_shipped, 5) . ' ' . measuringUnitString(0, "weight", $object->lines[$i]->weight_units, 1);
 					}
 					$voltxt = '';
 					if ($object->lines[$i]->fk_product_type == 0 && $object->lines[$i]->volume) {
-						$voltxt = round($object->lines[$i]->volume * $object->lines[$i]->qty_shipped, 5).' '.measuringUnitString(0, "volume", $object->lines[$i]->volume_units ? $object->lines[$i]->volume_units : 0, 1);
+						$voltxt = round($object->lines[$i]->volume * $object->lines[$i]->qty_shipped, 5) . ' ' . measuringUnitString(0, "volume", $object->lines[$i]->volume_units ? $object->lines[$i]->volume_units : 0, 1);
 					}
 
-
 					if ($this->getColumnStatus('weight')) {
-						$this->printStdColumnContent($pdf, $curY, 'weight', $weighttxt.(($weighttxt && $voltxt) ? '<br>' : '').$voltxt);
+						$this->printStdColumnContent($pdf, $curY, 'weight', $weighttxt . (($weighttxt && $voltxt) ? '<br>' : '') . $voltxt);
 						$nexY = max($pdf->GetY(), $nexY);
 					}
 
@@ -653,19 +654,48 @@ class pdf_espadon_truckorder extends ModelePdfExpedition
 						$nexY = max($pdf->GetY(), $nexY);
 					}
 
+					if ($this->getColumnStatus('qty_by_palette')) {
+						$qty_palette = '';
+						$prod = new Product($this->db);
+						$resultFetch = $prod->fetch($object->lines[$i]->fk_product);
+						if ($resultFetch < 0) {
+							setEventMessages($prod->error, $prod->errors, 'errors');
+						} elseif (!empty($prod->array_options['options_qtepalette'])) {
+							$qty_palette = $prod->array_options['options_qtepalette'];
+						}
+						$this->printStdColumnContent($pdf, $curY, 'qty_by_palette', $qty_palette);
+						$nexY = max($pdf->GetY(), $nexY);
+					}
+
 					if ($this->getColumnStatus('qty_shipped')) {
 						$qty_shipped = $object->lines[$i]->qty_shipped;
 						if (!empty($object->lines[$i]->fk_product)) {
 							$prod = new Product($this->db);
-							$resultFetch=$prod->fetch($object->lines[$i]->fk_product);
-							if ($resultFetch<0) {
+							$resultFetch = $prod->fetch($object->lines[$i]->fk_product);
+							if ($resultFetch < 0) {
 								setEventMessages($prod->error, $prod->errors, 'errors');
 							} elseif (!empty($prod->array_options['options_qtepalette'])) {
-								$qty_shipped .= '<br />'.$object->lines[$i]->qty_shipped/$prod->array_options['options_qtepalette'] . ' Palette(s)';
-								$qty_palette+=(int) ($object->lines[$i]->qty_shipped/$prod->array_options['options_qtepalette']);
+								$qty_palette += (int) ($object->lines[$i]->qty_shipped / $prod->array_options['options_qtepalette']);
 							}
 						}
 						$this->printStdColumnContent($pdf, $curY, 'qty_shipped', $qty_shipped);
+						$nexY = max($pdf->GetY(), $nexY);
+					}
+
+					if ($this->getColumnStatus('nb_palette')) {
+						$nb_palette=0;
+						if (!empty($object->lines[$i]->fk_product)) {
+							$prod = new Product($this->db);
+							$resultFetch = $prod->fetch($object->lines[$i]->fk_product);
+							if ($resultFetch < 0) {
+								setEventMessages($prod->error, $prod->errors, 'errors');
+							} elseif (!empty($prod->array_options['options_qtepalette'])) {
+								$nb_palette = $object->lines[$i]->qty_shipped / $prod->array_options['options_qtepalette'];
+								$nb_palette_total+=$nb_palette;
+							}
+						}
+
+						$this->printStdColumnContent($pdf, $curY, 'nb_palette', $nb_palette);
 						$nexY = max($pdf->GetY(), $nexY);
 					}
 
@@ -688,10 +718,10 @@ class pdf_espadon_truckorder extends ModelePdfExpedition
 					// Add line
 					if (!empty($conf->global->MAIN_PDF_DASH_BETWEEN_LINES) && $i < ($nblines - 1)) {
 						$pdf->setPage($pageposafter);
-						$pdf->SetLineStyle(array('dash'=>'1,1', 'color'=>array(80, 80, 80)));
+						$pdf->SetLineStyle(array('dash' => '1,1', 'color' => array(80, 80, 80)));
 						//$pdf->SetDrawColor(190,190,200);
 						$pdf->line($this->marge_gauche, $nexY, $this->page_largeur - $this->marge_droite, $nexY);
-						$pdf->SetLineStyle(array('dash'=>0));
+						$pdf->SetLineStyle(array('dash' => 0));
 					}
 
 					// Detect if some page were added automatically and output _tableau for past pages
@@ -739,7 +769,7 @@ class pdf_espadon_truckorder extends ModelePdfExpedition
 				}
 
 				// Display total area
-				$posy = $this->_tableau_tot($pdf, $object, 0, $bottomlasttab, $outputlangs, $qty_palette);
+				$posy = $this->_tableau_tot($pdf, $object, 0, $bottomlasttab, $outputlangs, $nb_palette_total);
 
 				// Pagefoot
 				$this->_pagefoot($pdf, $object, $outputlangs);
@@ -753,7 +783,7 @@ class pdf_espadon_truckorder extends ModelePdfExpedition
 
 				// Add pdfgeneration hook
 				$hookmanager->initHooks(array('pdfgeneration'));
-				$parameters = array('file'=>$file, 'object'=>$object, 'outputlangs'=>$outputlangs);
+				$parameters = array('file' => $file, 'object' => $object, 'outputlangs' => $outputlangs);
 				global $action;
 				$reshook = $hookmanager->executeHooks('afterPDFCreation', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 				if ($reshook < 0) {
@@ -765,7 +795,7 @@ class pdf_espadon_truckorder extends ModelePdfExpedition
 					@chmod($file, octdec($conf->global->MAIN_UMASK));
 				}
 
-				$this->result = array('fullpath'=>$file);
+				$this->result = array('fullpath' => $file);
 
 				return 1; // No error
 			} else {
@@ -781,17 +811,17 @@ class pdf_espadon_truckorder extends ModelePdfExpedition
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
-	 *	Show total to pay
+	 *    Show total to pay
 	 *
-	 *	@param	TCPDF		$pdf            Object PDF
-	 *	@param  Expedition	$object         Object expedition
-	 *	@param  int			$deja_regle     Amount already paid
-	 *	@param	int         $posy           Start Position
-	 *	@param	Translate	$outputlangs	Objet langs
-	 *	@param	int			$qty_palette	Qty Total Palette
-	 *	@return int							Position for suite
+	 * @param TCPDF $pdf Object PDF
+	 * @param Expedition $object Object expedition
+	 * @param int $deja_regle Amount already paid
+	 * @param int $posy Start Position
+	 * @param Translate $outputlangs Objet langs
+	 * @param int $nb_palette_total Nb Total Palette
+	 * @return int                            Position for suite
 	 */
-	protected function _tableau_tot(&$pdf, $object, $deja_regle, $posy, $outputlangs, $qty_palette = 0)
+	protected function _tableau_tot(&$pdf, $object, $deja_regle, $posy, $outputlangs, $nb_palette_total = 0)
 	{
 		// phpcs:enable
 		global $conf, $mysoc;
@@ -868,11 +898,17 @@ class pdf_espadon_truckorder extends ModelePdfExpedition
 			$this->printStdColumnContent($pdf, $tab2_top, 'qty_asked', $totalOrdered);
 		}
 
+		//No need qty shipped total here
+		$totalToShip=0;
 		if ($this->getColumnStatus('qty_shipped') && $totalToShip) {
 			if (!empty($qty_palette)) {
-				$totalToShip.= '<br />'. $qty_palette .' Palette(s)';
+				$totalToShip .= '<br />' . $qty_palette . ' Palette(s)';
 			}
 			$this->printStdColumnContent($pdf, $tab2_top, 'qty_shipped', $totalToShip);
+		}
+
+		if ($this->getColumnStatus('nb_palette') && $nb_palette_total) {
+			$this->printStdColumnContent($pdf, $tab2_top, 'nb_palette', $nb_palette_total);
 		}
 
 		if ($this->getColumnStatus('subprice')) {
@@ -885,17 +921,18 @@ class pdf_espadon_truckorder extends ModelePdfExpedition
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+
 	/**
 	 *   Show table for lines
 	 *
-	 *   @param		TCPDF		$pdf     		Object PDF
-	 *   @param		string		$tab_top		Top position of table
-	 *   @param		string		$tab_height		Height of table (rectangle)
-	 *   @param		int			$nexY			Y
-	 *   @param		Translate	$outputlangs	Langs object
-	 *   @param		int			$hidetop		Hide top bar of array
-	 *   @param		int			$hidebottom		Hide bottom bar of array
-	 *   @return	void
+	 * @param TCPDF $pdf Object PDF
+	 * @param string $tab_top Top position of table
+	 * @param string $tab_height Height of table (rectangle)
+	 * @param int $nexY Y
+	 * @param Translate $outputlangs Langs object
+	 * @param int $hidetop Hide top bar of array
+	 * @param int $hidebottom Hide bottom bar of array
+	 * @return    void
 	 */
 	protected function _tableau(&$pdf, $tab_top, $tab_height, $nexY, $outputlangs, $hidetop = 0, $hidebottom = 0)
 	{
@@ -936,14 +973,15 @@ class pdf_espadon_truckorder extends ModelePdfExpedition
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+
 	/**
 	 *  Show top header of page.
 	 *
-	 *  @param	TCPDF		$pdf     		Object PDF
-	 *  @param  Expedition	$object     	Object to show
-	 *  @param  int	    	$showaddress    0=no, 1=yes
-	 *  @param  Translate	$outputlangs	Object lang for output
-	 *  @return	void
+	 * @param TCPDF $pdf Object PDF
+	 * @param Expedition $object Object to show
+	 * @param int $showaddress 0=no, 1=yes
+	 * @param Translate $outputlangs Object lang for output
+	 * @return    void
 	 */
 	protected function _pagehead(&$pdf, $object, $showaddress, $outputlangs)
 	{
@@ -957,7 +995,7 @@ class pdf_espadon_truckorder extends ModelePdfExpedition
 
 		// Show Draft Watermark
 		if ($object->statut == 0 && (!empty($conf->global->SHIPPING_DRAFT_WATERMARK))) {
-					pdf_watermark($pdf, $outputlangs, $this->page_hauteur, $this->page_largeur, 'mm', $conf->global->SHIPPING_DRAFT_WATERMARK);
+			pdf_watermark($pdf, $outputlangs, $this->page_hauteur, $this->page_largeur, 'mm', $conf->global->SHIPPING_DRAFT_WATERMARK);
 		}
 
 		//Prepare next
@@ -972,7 +1010,7 @@ class pdf_espadon_truckorder extends ModelePdfExpedition
 		$pdf->SetXY($this->marge_gauche, $posy);
 
 		// Logo
-		$logo = $conf->mycompany->dir_output.'/logos/'.$this->emetteur->logo;
+		$logo = $conf->mycompany->dir_output . '/logos/' . $this->emetteur->logo;
 		if ($this->emetteur->logo) {
 			if (is_readable($logo)) {
 				$height = pdf_getHeightForLogo($logo);
@@ -1024,21 +1062,21 @@ class pdf_espadon_truckorder extends ModelePdfExpedition
 
 		$pdf->SetXY($posx, $posy);
 		$pdf->SetTextColor(0, 0, 60);
-		$pdf->MultiCell($w, 4, $outputlangs->transnoentities("RefSending")." : ".$object->ref, '', 'R');
+		$pdf->MultiCell($w, 4, $outputlangs->transnoentities("RefSending") . " : " . $object->ref, '', 'R');
 
 		// Date planned delivery
 		if (!empty($object->date_delivery)) {
-				$posy += 4;
-				$pdf->SetXY($posx, $posy);
-				$pdf->SetTextColor(0, 0, 60);
-				$pdf->MultiCell($w, 4, $outputlangs->transnoentities("DateDeliveryPlanned")." : ".dol_print_date($object->date_delivery, "day", false, $outputlangs, true), '', 'R');
+			$posy += 4;
+			$pdf->SetXY($posx, $posy);
+			$pdf->SetTextColor(0, 0, 60);
+			$pdf->MultiCell($w, 4, $outputlangs->transnoentities("DateDeliveryPlanned") . " : " . dol_print_date($object->date_delivery, "day", false, $outputlangs, true), '', 'R');
 		}
 
 		if (!empty($object->thirdparty->code_client)) {
 			$posy += 4;
 			$pdf->SetXY($posx, $posy);
 			$pdf->SetTextColor(0, 0, 60);
-			$pdf->MultiCell($w, 3, $outputlangs->transnoentities("CustomerCode")." : ".$outputlangs->transnoentities($object->thirdparty->code_client), '', 'R');
+			$pdf->MultiCell($w, 3, $outputlangs->transnoentities("CustomerCode") . " : " . $outputlangs->transnoentities($object->thirdparty->code_client), '', 'R');
 		}
 
 
@@ -1062,14 +1100,14 @@ class pdf_espadon_truckorder extends ModelePdfExpedition
 				$pdf->SetFont('', '', $default_font_size - 2);
 				$text = $linkedobject->ref;
 				if ($linkedobject->ref_client) {
-					$text .= ' ('.$linkedobject->ref_client.')';
+					$text .= ' (' . $linkedobject->ref_client . ')';
 				}
 				$Yoff = $Yoff + 8;
 				$pdf->SetXY($this->page_largeur - $this->marge_droite - $w, $Yoff);
-				$pdf->MultiCell($w, 2, $outputlangs->transnoentities("RefOrder")." : ".$outputlangs->transnoentities($text), 0, 'R');
+				$pdf->MultiCell($w, 2, $outputlangs->transnoentities("RefOrder") . " : " . $outputlangs->transnoentities($text), 0, 'R');
 				$Yoff = $Yoff + 3;
 				$pdf->SetXY($this->page_largeur - $this->marge_droite - $w, $Yoff);
-				$pdf->MultiCell($w, 2, $outputlangs->transnoentities("OrderDate")." : ".dol_print_date($linkedobject->date, "day", false, $outputlangs, true), 0, 'R');
+				$pdf->MultiCell($w, 2, $outputlangs->transnoentities("OrderDate") . " : " . dol_print_date($linkedobject->date, "day", false, $outputlangs, true), 0, 'R');
 			}
 		}
 
@@ -1083,7 +1121,7 @@ class pdf_espadon_truckorder extends ModelePdfExpedition
 			}
 			if (is_array($arrayidcontact) && count($arrayidcontact) > 0) {
 				$object->fetch_user(reset($arrayidcontact));
-				$carac_emetteur .= ($carac_emetteur ? "\n" : '').$outputlangs->transnoentities("Name").": ".$outputlangs->convToOutputCharset($object->user->getFullName($outputlangs))."\n";
+				$carac_emetteur .= ($carac_emetteur ? "\n" : '') . $outputlangs->transnoentities("Name") . ": " . $outputlangs->convToOutputCharset($object->user->getFullName($outputlangs)) . "\n";
 			}
 
 			$carac_emetteur .= pdf_build_address($outputlangs, $this->emetteur, $object->thirdparty, '', 0, 'source', $object);
@@ -1175,14 +1213,15 @@ class pdf_espadon_truckorder extends ModelePdfExpedition
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+
 	/**
-	 *   	Show footer of page. Need this->emetteur object
+	 *    Show footer of page. Need this->emetteur object
 	 *
-	 *   	@param	TCPDF		$pdf     			PDF
-	 * 		@param	Expedition	$object				Object to show
-	 *      @param	Translate	$outputlangs		Object lang for output
-	 *      @param	int			$hidefreetext		1=Hide free text
-	 *      @return	int								Return height of bottom margin including footer text
+	 * @param TCPDF $pdf PDF
+	 * @param Expedition $object Object to show
+	 * @param Translate $outputlangs Object lang for output
+	 * @param int $hidefreetext 1=Hide free text
+	 * @return    int                                Return height of bottom margin including footer text
 	 */
 	protected function _pagefoot(&$pdf, $object, $outputlangs, $hidefreetext = 0)
 	{
@@ -1192,14 +1231,14 @@ class pdf_espadon_truckorder extends ModelePdfExpedition
 	}
 
 	/**
-	 *   	Define Array Column Field
+	 *    Define Array Column Field
 	 *
-	 *   	@param	Expedition	   $object    	    common object
-	 *   	@param	Translate	   $outputlangs     langs
-	 *      @param	int			   $hidedetails		Do not show line details
-	 *      @param	int			   $hidedesc		Do not show desc
-	 *      @param	int			   $hideref			Do not show ref
-	 *      @return	null
+	 * @param Expedition $object common object
+	 * @param Translate $outputlangs langs
+	 * @param int $hidedetails Do not show line details
+	 * @param int $hidedesc Do not show desc
+	 * @param int $hideref Do not show ref
+	 * @return    null
 	 */
 	public function defineColumnField($object, $outputlangs, $hidedetails = 0, $hidedesc = 0, $hideref = 0)
 	{
@@ -1275,13 +1314,12 @@ class pdf_espadon_truckorder extends ModelePdfExpedition
 		$this->cols['weight'] = array(
 			'rank' => $rank,
 			'width' => 30, // in mm
-			'status' => true,
+			'status' => false,
 			'title' => array(
 				'textkey' => 'WeightVolShort'
 			),
 			'border-left' => true, // add left line separator
 		);
-
 
 		$rank = $rank + 10;
 		$this->cols['subprice'] = array(
@@ -1309,9 +1347,23 @@ class pdf_espadon_truckorder extends ModelePdfExpedition
 		$this->cols['qty_asked'] = array(
 			'rank' => $rank,
 			'width' => 30, // in mm
-			'status' => empty($conf->global->SHIPPING_PDF_HIDE_ORDERED) ? 1 : 0,
+			'status' => false,
 			'title' => array(
 				'textkey' => 'QtyOrdered'
+			),
+			'border-left' => true, // add left line separator
+			'content' => array(
+				'align' => 'C',
+			),
+		);
+
+		$rank = $rank + 10;
+		$this->cols['qty_by_palette'] = array(
+			'rank' => $rank,
+			'width' => 30, // in mm
+			'status' => 1,
+			'title' => array(
+				'textkey' => 'Qté. par palette'
 			),
 			'border-left' => true, // add left line separator
 			'content' => array(
@@ -1325,7 +1377,21 @@ class pdf_espadon_truckorder extends ModelePdfExpedition
 			'width' => 30, // in mm
 			'status' => true,
 			'title' => array(
-				'textkey' => 'QtyToShip'
+				'textkey' => 'Qty'
+			),
+			'border-left' => true, // add left line separator
+			'content' => array(
+				'align' => 'C',
+			),
+		);
+
+		$rank = $rank + 10;
+		$this->cols['nb_palette'] = array(
+			'rank' => $rank,
+			'width' => 30, // in mm
+			'status' => true,
+			'title' => array(
+				'textkey' => 'Nb. palette(s)'
 			),
 			'border-left' => true, // add left line separator
 			'content' => array(
