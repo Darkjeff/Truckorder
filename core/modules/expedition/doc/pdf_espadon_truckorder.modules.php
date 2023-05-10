@@ -329,6 +329,8 @@ class pdf_espadon_truckorder extends ModelePdfExpedition
 
 				$this->posxdesc = $this->marge_gauche + 1;
 
+				$qty_palette = 0;
+
 				// Incoterm
 				$height_incoterms = 0;
 				if (!empty($conf->incoterm->enabled)) {
@@ -660,6 +662,7 @@ class pdf_espadon_truckorder extends ModelePdfExpedition
 								setEventMessages($prod->error, $prod->errors, 'errors');
 							} elseif (!empty($prod->array_options['options_qtepalette'])) {
 								$qty_shipped .= '<br />'.$object->lines[$i]->qty_shipped/$prod->array_options['options_qtepalette'] . ' Palette(s)';
+								$qty_palette+=(int)($object->lines[$i]->qty_shipped/$prod->array_options['options_qtepalette']);
 							}
 						}
 						$this->printStdColumnContent($pdf, $curY, 'qty_shipped', $qty_shipped);
@@ -736,7 +739,7 @@ class pdf_espadon_truckorder extends ModelePdfExpedition
 				}
 
 				// Display total area
-				$posy = $this->_tableau_tot($pdf, $object, 0, $bottomlasttab, $outputlangs);
+				$posy = $this->_tableau_tot($pdf, $object, 0, $bottomlasttab, $outputlangs,$qty_palette);
 
 				// Pagefoot
 				$this->_pagefoot($pdf, $object, $outputlangs);
@@ -785,9 +788,10 @@ class pdf_espadon_truckorder extends ModelePdfExpedition
 	 *	@param  int			$deja_regle     Amount already paid
 	 *	@param	int         $posy           Start Position
 	 *	@param	Translate	$outputlangs	Objet langs
+	 *	@param	int			$qty_palette	Qty Total Palette
 	 *	@return int							Position for suite
 	 */
-	protected function _tableau_tot(&$pdf, $object, $deja_regle, $posy, $outputlangs)
+	protected function _tableau_tot(&$pdf, $object, $deja_regle, $posy, $outputlangs, $qty_palette=0)
 	{
 		// phpcs:enable
 		global $conf, $mysoc;
@@ -844,13 +848,9 @@ class pdf_espadon_truckorder extends ModelePdfExpedition
 			$totalVolumetoshow = showDimensionInBestUnit($object->trueVolume, $object->volume_units, "volume", $outputlangs);
 		}
 
-
-
-
 		if ($this->getColumnStatus('desc')) {
 			$this->printStdColumnContent($pdf, $tab2_top, 'desc', $outputlangs->transnoentities("Total"));
 		}
-
 
 		if ($this->getColumnStatus('weight')) {
 			if ($totalWeighttoshow) {
@@ -869,6 +869,9 @@ class pdf_espadon_truckorder extends ModelePdfExpedition
 		}
 
 		if ($this->getColumnStatus('qty_shipped') && $totalToShip) {
+			if (!empty($qty_palette)) {
+				$totalToShip.= '<br />'. $qty_palette .' Palette(s)';
+			}
 			$this->printStdColumnContent($pdf, $tab2_top, 'qty_shipped', $totalToShip);
 		}
 
